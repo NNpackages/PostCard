@@ -1,9 +1,12 @@
-#' Generic for extracting the fitted prognostic model
+#' Extract information about the fitted prognostic model
 #'
-#' Extract the fitted prognostic model.
+#' Extracts the `prognostic_info` list element from an `rctglm_prog` object. See
+#' 'Value' at [rctglm_with_prognosticscore] for more details.
 #'
 #' @param x an object of class `rctglm_prog` (returned by
 #' [rctglm_with_prognosticscore])
+#'
+#' @return description
 #'
 #' @export
 #' @examples
@@ -33,13 +36,13 @@
 #'   estimand_fun = "ate",
 #'   data_hist = dat_notreat)
 #'
-#' prog_model(ate)
-prog_model <- function(x) {
-  UseMethod("prog_model")
+#' prog(ate)
+prog <- function(x) {
+  UseMethod("prog")
 }
 
 #' @export
-#' @rdname prog_model
-prog_model.rctglm_prog <- function(x) {
-  x$prognostic_info$model_fit
+#' @rdname prog
+prog.rctglm_prog <- function(x) {
+  x$prognostic_info
 }

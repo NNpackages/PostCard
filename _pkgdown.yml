@@ -24,7 +24,7 @@ reference:
     to improve efficiency
   contents:
   - rctglm_with_prognosticscore
-  - prog_model
+  - prog
   - fit_best_learner
 - title: Power approximation
   desc: >

@@ -89,3 +89,19 @@ test_that("Error occurs when trying to use variable in formula that's not define
     glm_data(1+x1+x2, x1 = rnorm(10))
   )
 })
+
+test_that("Error occurs in `check_family` when family is not valid", {
+  # Character
+  expect_error({
+    check_family(family = "testing")
+  },
+  regexp = "object 'testing' of mode 'function' was not found")
+
+  # Object with NULL family list element
+  expect_output({
+    expect_error({
+      family <- check_family(family = list(A = 1, B = 2))
+    },
+    regexp = "'family' not recognized")
+  })
+})

@@ -12,13 +12,28 @@ deparse_fun_body <- function(fun) {
   return(out)
 }
 
+#' Transform character or family function to a call
+check_formula <- function(formula) {
+  if (is.character(formula)) {
+    formula <- formula(formula)
+  }
+  if (!inherits(formula, "formula")) {
+    cli::cli_abort("{.arg formula} needs to have class `formula` or `character`")
+  }
+
+  return(formula)
+}
+
+formula_to_str <- function(formula) {
+  deparse(formula)
+}
+
 # Extract response from formula to
 get_response_from_formula <- function(formula) {
-  if (!inherits(formula, "formula"))
-    cli::cli_abort("{.arg formula} needs to have class `formula`")
+  formula <- check_formula(formula)
 
-  formula_char <- deparse(formula)
-  lhs_oftilde <- gsub("\\s*~.*", "", formula_char)
+  formula <- formula_to_str(formula)
+  lhs_oftilde <- gsub("\\s*~.*", "", formula)
   return(lhs_oftilde)
 }
 

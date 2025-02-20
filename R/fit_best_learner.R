@@ -4,28 +4,31 @@
 #'
 #' @param cv_folds a `numeric` with the number of cross-validation folds used when fitting and
 #' evaluating models
-#' @param learners a `list` of `tidymodels`. Default uses a combination of MARS, linear
-#' regression and boosted trees
+#' @param learners a `list` of `tidymodels`
 #'
 #' @return a trained `workflow`
 #' @export
 #'
 #' @examples
-#' # Generate some "historical" data of a control treatment
+#' # Generate some synthetic 2-armed RCT data along with historical controls
 #' n <- 100
-#' w1 <- runif(n, min = -2, max = 2)
-#' x1 <- abs(sin(w1))
-#' a <- rbinom (n, 1, .5)
-#' b0 <- 1
-#' b1 <- 1.5
-#' b2 <- 2
+#' dat_rct <- glm_data(
+#'   1+2*x1+3*a,
+#'   x1 = rnorm(n, 2),
+#'   a = rbinom (n, 1, .5),
+#'   family = gaussian()
+#' )
+#' dat_hist <- glm_data(
+#'   1+2*x1,
+#'   x1 = rnorm(n, 2),
+#'   family = gaussian()
+#' )
 #'
-#' truemean_notreat <- b0+b1*x1
-#' y_notreat <- rnorm(n, mean = truemean_notreat, sd = 1)
-#' dat_hist <- data.frame(Y = y_notreat, W = w1)
-#'
-#' # Fit a learner to the data with default learners
+#' # Fit a learner to the historical control data with default learners
 #' fit <- fit_best_learner(Y ~ ., data = dat_hist)
+#'
+#' # Use it fx. to predict the "control outcome" in the 2-armed RCT
+#' predict(fit, new_data = dat_rct)
 fit_best_learner <- function(data, formula, cv_folds = 5, learners = default_learners(),
                              verbose = options::opt("verbose")) {
   cv_folds <- rsample::vfold_cv(data, v = cv_folds)
@@ -123,9 +126,9 @@ get_best_learner <- function(
 
   best_learner_name <- fit_learners %>%
     workflowsets::rank_results(rank_metric = 'rmse') %>%
-    dplyr::select(.data$wflow_id, .data$model, .data$.config, rmse=mean, rank) %>%
+    dplyr::select("wflow_id", "model", ".config", rmse=mean, rank) %>%
     dplyr::filter(dplyr::row_number() == 1) %>%
-    dplyr::pull(.data$wflow_id)
+    dplyr::pull("wflow_id")
 
   if (verbose >= 1) {
     cli::cli_alert_info("Model with lowest RMSE: {best_learner_name}")

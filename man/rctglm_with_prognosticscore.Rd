@@ -68,8 +68,7 @@ model on the historical data \code{data_hist}. Default models the response (assu
 \item{cv_folds}{a \code{numeric} with the number of cross-validation folds used when fitting and
 evaluating models}
 
-\item{learners}{a \code{list} of \code{tidymodels}. Default uses a combination of MARS, linear
-regression and boosted trees}
+\item{learners}{a \code{list} of \code{tidymodels}}
 
 \item{verbose}{\code{numeric} verbosity level. Higher values means more information is
 printed in console. A value of 0 means nothing is printed to console during
@@ -88,6 +87,8 @@ but with an additional list element of:
 \item \code{prognostic_info}: List with information about the fitted prognostic model
 on historical data. It has components:
 \itemize{
+\item \code{formula}: The \code{formula} with symbolic description of how the response
+is modelled as function of covariates in the models
 \item \code{model_fit}: A trained \code{workflow} - the result of \link{fit_best_learner}
 \item \code{learners}: A \code{list} of learners used for the discrete super learner
 \item \code{cv_folds}: The amount of folds used for cross validation
@@ -132,4 +133,6 @@ ate <- rctglm_with_prognosticscore(
   estimand_fun = "ate",
   data_hist = dat_notreat)
 
+# Pull information on estimand
+estimand(ate)
 }

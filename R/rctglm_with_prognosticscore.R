@@ -26,6 +26,8 @@
 #' but with an additional list element of:
 #' - `prognostic_info`: List with information about the fitted prognostic model
 #' on historical data. It has components:
+#'    - `formula`: The `formula` with symbolic description of how the response
+#'    is modelled as function of covariates in the models
 #'    - `model_fit`: A trained `workflow` - the result of [fit_best_learner]
 #'    - `learners`: A `list` of learners used for the discrete super learner
 #'    - `cv_folds`: The amount of folds used for cross validation
@@ -60,6 +62,8 @@
 #'   estimand_fun = "ate",
 #'   data_hist = dat_notreat)
 #'
+#' # Pull information on estimand
+#' estimand(ate)
 rctglm_with_prognosticscore <- function(
     formula,
     family,
@@ -81,7 +85,7 @@ rctglm_with_prognosticscore <- function(
   named_args <- as.list(environment())
   extra_glm_args <- list(...)
 
-  if (is.character(formula)) formula <- formula(formula)
+  formula <- check_formula(formula)
 
   if (verbose >= 1) cli::cli_h2("Fitting prognostic model")
   if (is.null(prog_formula)) {
@@ -118,7 +122,7 @@ rctglm_with_prognosticscore <- function(
   if (verbose >= 2)
     cli::cli_alert_info("Investigate trained learners and fitted model in {.var prognostic_info} list element")
 
-  formula_with_prognosticscore <- paste0(deparse(formula), " + prog")
+  formula_with_prognosticscore <- paste0(formula_to_str(formula), " + prog")
 
   rctglm_with_prognosticscore <- rctglm(
     formula = formula_with_prognosticscore,
@@ -135,6 +139,7 @@ rctglm_with_prognosticscore <- function(
 
   prog_info <- list(
     prognostic_info = list(
+      formula = prog_formula,
       model_fit = lrnr_fit,
       learners = learners,
       cv_folds = cv_folds,

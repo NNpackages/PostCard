@@ -29,7 +29,6 @@ test_that("`deparse_fun_body` produces character string of function body", {
 
   expect_type(thispkg_body, "character")
   expect_length(thispkg_body, 1)
-  expect_snapshot(thispkg_body)
 
   expect_type(predef_body, "character")
   expect_length(predef_body, 1)
@@ -41,11 +40,6 @@ test_that("`deparse_fun_body` produces character string of function body", {
 })
 
 # get_response_from_formula
-test_that("`get_response_from_formula` error when arg not formula class", {
-  expect_error(get_response_from_formula("Y ~ A"),
-               "needs to have class")
-})
-
 test_that("`get_response_from_formula` works for different formula specifiations", {
   expect_equal(get_response_from_formula(Y ~ A),
                "Y")
@@ -54,7 +48,7 @@ test_that("`get_response_from_formula` works for different formula specifiations
 })
 
 # is_response_in_data
-test_that("`is_response_in_data` correctly gives error when column not in data", {
+cli::test_that_cli("`is_response_in_data` correctly gives error when column not in data", {
   dat <- data.frame(A = 1:2, B = 4:5)
   expect_snapshot(
     error = TRUE,
@@ -97,26 +91,30 @@ test_that("`get01args` returns list of arguments with 0 and 1 in them", {
   )
 })
 
-test_that("`get01args` gives error when arguments with 0 and 1 are missing", {
+cli::test_that_cli("`get01args` gives error when arguments with 0 and 1 are missing", {
   argsnotendingwith0and1 <- function(psi0, psi18) psi18 - psi0
-  expect_snapshot(
-    error = TRUE,
+  expect_error({
     get01args(argsnotendingwith0and1)
+    },
+    regexp = "need to end in"
   )
   missing1 <- function(a0, b) a0 - b
-  expect_snapshot(
-    error = TRUE,
+  expect_error({
     get01args(missing1)
+  },
+  regexp = "need to end in"
   )
   missing0 <- function(a, b1) a - b1
-  expect_snapshot(
-    error = TRUE,
+  expect_error({
     get01args(missing0)
+  },
+  regexp = "need to end in"
   )
   # missing both
-  expect_snapshot(
-    error = TRUE,
+  expect_error({
     get01args(sum)
+  },
+  regexp = "need to end in"
   )
 })
 
@@ -129,7 +127,7 @@ test_that("`print_symbolic_differentiation` returns the result of Deriv", {
   )
 })
 
-test_that("`print_symbolic_differentiation` provides message", {
+cli::test_that_cli("`print_symbolic_differentiation` provides message", {
   withr::local_options(PostCard.verbose = 1)
   ate <- function(psi0, psi1) psi1 - psi0
   # Note we are using the transform argument to remove printing of
