@@ -20,7 +20,8 @@ knitr::opts_chunk$set(
 [![Codecov test coverage](https://codecov.io/gh/NNpackages/PostCard/graph/badge.svg)](https://app.codecov.io/gh/NNpackages/PostCard)
 <!-- badges: end -->
 
-PostCard is a package for PrOgnoSTic CovARiate aDjustment in randomised clinical trials. At the time of writing, the package features convenient functions for conducting analysis using prognostic covariate adjustment for GLMs. The package uses plug-in estimation for robust estimation of a marginal effect estimand and influence functions for robust estimation of the variance of the estimand.
+PostCard is a package for PrOgnoSTic CovARiate aDjustment in randomised clinical trials. At the time of writing, the package features convenient functions for conducting analysis using prognostic covariate adjustment for GLMs. Let $\Psi_a=\E[Y(a)]$ be the population mean outcome under treatment $a=0, 1$, sometimes referred to as *counterfactual means*. We are interested in marginal effects, which are causal effects of the form $r(\Psi_1, \Psi_0)$. The package uses plug-in estimation for robust estimation of a marginal effect estimand and (CV) influence functions for robust estimation of the variance of the estimand (Rosenblum, M. and M. J. van der Laan, 2010: Simple, efficient estimators of treatment effects in randomized trials using generalized linear models to leverage baseline variables. The International Journal of Biostatistics, 6, no. 1).
+
 
 ## Installation
 
