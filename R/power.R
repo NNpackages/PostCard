@@ -178,3 +178,42 @@ var_update_rho_R2 <- function(var, rho, R2) {
     new_var <- var*(1 - R2)
   return(new_var)
 }
+
+#' Title
+#'
+#' @param data
+#' @param response
+#' @param ...
+#' @param inflation
+#' @param deflation
+#'
+#' @details
+#' See article Zimmermann, G., Kieser, M., & Bathke, A. C. (2019). Sample size
+#' calculation and blinded recalculation for analysis of covariance models with
+#' multiple random covariates. Journal of Biopharmaceutical Statistics, 30(1),
+#' 143–159. https://doi.org/10.1080/10543406.2019.1632871
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+variance_bound_gs <- function(data, response = Y, ..., inflation = 1.25, deflation = 1) {
+  response_vec <- data %>%
+    dplyr::pull({{response_name}})
+  var_Y <- response_vec %>%
+    var()
+  var_Y_inf <- var_Y * inflation
+
+  Sigma_X.I <- data %>%
+    dplyr::select(...) %>%
+    cov() %>%
+    chol() %>%
+    chol2inv()
+  sigma_XY <- cov(data %>% dplyr::select(adjustment_cov), response)
+
+  R2 <- as.numeric((t(sigma_XY) %*% Sigma_X.I %*% sigma_XY) / var_Y_inf)
+  R2_def <- R2 * deflation
+
+  var_bound <- var_Y_inf * (1 - R2_def)
+  return(var_bound)
+}

@@ -12,7 +12,7 @@ deparse_fun_body <- function(fun) {
   return(out)
 }
 
-#' Transform character or family function to a call
+# Transform character or family function to a call
 check_formula <- function(formula) {
   if (is.character(formula)) {
     formula <- formula(formula)

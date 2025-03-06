@@ -6,6 +6,9 @@
 #' evaluating models
 #' @param learners a `list` of `tidymodels`
 #'
+#' @details
+#' Ensure data compatibility with the learners.
+#'
 #' @return a trained `workflow`
 #' @export
 #'
