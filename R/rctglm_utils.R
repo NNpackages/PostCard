@@ -6,7 +6,7 @@ predict_counterfactual_mean <- function(model,
                                         data = NULL) {
   if (is.null(data)) data <- model$data
   if (is.null(newdata)) newdata <- data
-  newdata_same_group_val <- newdata |>
+  newdata_same_group_val <- newdata %>%
     dplyr::mutate("{group_indicator_name}" := group_val)
 
   group_indicator_in_model <- group_indicator_name %in% names(coef(model))
@@ -56,6 +56,8 @@ oos_fitted.values_counterfactual <- function(
     full_model.args_glm,
     cv_variance_folds = 5
 ) {
+  data <- data %>%
+    dplyr::mutate(rowname = dplyr::row_number())
   folds <- rsample::vfold_cv(
     data,
     v = cv_variance_folds,
@@ -76,14 +78,16 @@ oos_fitted.values_counterfactual <- function(
       model = model_train,
       group_indicator_name = group_indicator_name,
       newdata = x$test
-    )
+    ) %>%
+      dplyr::mutate(rowname = as.numeric(x$test$rowname))
     return(preds)
   }) %>%
     dplyr::bind_rows()
 
-  out$rowname <- row.names(out)
+  # Added the rowname before, and sorting now to "collect" the out-of-sample
+  # predictions in the same order as data was originally
   out <- out %>%
-    dplyr::arrange(as.numeric(.data$rowname))
+    dplyr::arrange(.data$rowname)
 
   return(out)
 }
