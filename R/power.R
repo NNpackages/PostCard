@@ -178,3 +178,71 @@ var_update_rho_R2 <- function(var, rho, R2) {
     new_var <- var*(1 - R2)
   return(new_var)
 }
+
+#' Title
+#'
+#' @param data the data used to estimate the variance bound
+#' @param response the response variable in the data for which
+#' @param ...
+#' @param inflation
+#' @param deflation
+#'
+#' @details
+#' See article Zimmermann, G., Kieser, M., & Bathke, A. C. (2019). Sample size
+#' calculation and blinded recalculation for analysis of covariance models with
+#' multiple random covariates. Journal of Biopharmaceutical Statistics, 30(1),
+#' 143–159. https://doi.org/10.1080/10543406.2019.1632871
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+#' # Generate a negative binomial response
+#' nb <- glm_data(1+2*x1-x2,
+#'                 x1 = rnorm(10),
+#'                 x2 = rgamma(10, shape = 2),
+#'                 family = MASS::negative.binomial(2))
+#' variance_bound_gs(nb, response_name = "Y")
+variance_bound_gs <- function(formula, data, inflation = 1.25, deflation = 1) {
+  if(missing(data)) data <- environment(formula)
+  mf <- match.call(expand.dots = FALSE)
+  m <- match(c("formula", "data", "subset", "weights", "na.action",
+               "etastart", "mustart", "offset"), names(mf), 0L)
+  mf <- mf[c(1L, m)]
+  mf$drop.unused.levels <- TRUE
+  ## need stats:: for non-standard evaluation
+  mf[[1L]] <- quote(stats::model.frame)
+  mf <- eval(mf, parent.frame())
+
+  Y <- model.response(mf)
+  var_Y <- Y %>%
+    var()
+  var_Y_inf <- var_Y * inflation
+
+  mt <- attr(mf, "terms")
+  X <- model.matrix(mt, mf)[, -1]
+
+  # covs <- rlang::enquos(...)
+  # lapply(covs, rlang::as_name)
+  # no_covs_specified <- length(covs) == 0
+  # if (no_covs_specified)
+  #   data_sel <- data
+  # else
+  #   data_sel <- data %>%
+  #   dplyr::select(...)
+  #
+  # data_covs <- data_sel %>%
+  #   dplyr::select(-tidyselect::any_of(response_name))
+
+  Sigma_X.I <- X %>%
+    cov() %>%
+    chol() %>%
+    chol2inv()
+  sigma_XY <- cov(X, Y)
+
+  R2 <- as.numeric((t(sigma_XY) %*% Sigma_X.I %*% sigma_XY) / var_Y_inf)
+  R2_def <- R2 * deflation
+
+  var_bound <- var_Y_inf * (1 - R2_def)
+  return(var_bound)
+}

@@ -13,11 +13,10 @@ fit_best_learner(
 )
 }
 \arguments{
-\item{data}{an optional data frame, list or environment (or object
-    coercible by \code{\link{as.data.frame}} to a data frame) containing
-    the variables in the model.  If not found in \code{data}, the
-    variables are taken from \code{environment(formula)},
-    typically the environment from which \code{glm} is called.}
+\item{data}{an optional data frame, list or environment (or object coercible
+by as.data.frame to a data frame) containing the variables in the model. If
+not found in data, the variables are taken from environment(formula), typically
+the environment from which the function is called.}
 
 \item{formula}{an object of class "formula" (or one that can be coerced to that class):
 a symbolic description of the model to be fitted. The details of model specification are
@@ -37,6 +36,9 @@ a trained \code{workflow}
 }
 \description{
 Find the best learner in terms of RMSE among specified learners using cross validation
+}
+\details{
+Ensure data compatibility with the learners.
 }
 \examples{
 # Generate some synthetic 2-armed RCT data along with historical controls

@@ -36,11 +36,10 @@ make the "orientation" of the \code{estimand_fun} clear.}
     third option is supported.  (See \code{\link[stats]{family}} for details of
     family functions.)}
 
-\item{data}{an optional data frame, list or environment (or object
-    coercible by \code{\link{as.data.frame}} to a data frame) containing
-    the variables in the model.  If not found in \code{data}, the
-    variables are taken from \code{environment(formula)},
-    typically the environment from which \code{glm} is called.}
+\item{data}{an optional data frame, list or environment (or object coercible
+by as.data.frame to a data frame) containing the variables in the model. If
+not found in data, the variables are taken from environment(formula), typically
+the environment from which the function is called.}
 
 \item{group_allocation_prob}{a \code{numeric} with the probabiliy of being assigned "group 1" (rather than group 0).
 As a default, the ratio of 1's in data is used.}
