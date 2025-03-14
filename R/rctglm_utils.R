@@ -58,15 +58,25 @@ oos_fitted.values_counterfactual <- function(
 ) {
   data <- data %>%
     dplyr::mutate(rowname = dplyr::row_number())
-  folds <- rsample::vfold_cv(
-    data,
-    v = cv_variance_folds,
-    strata = tidyselect::all_of(exposure_indicator_name)
-  )
-  train_test_folds <- lapply(
-    folds$splits,
-    extract_train_test
-  )
+
+  test_size <- nrow(data) / cv_variance_folds
+  split_indices <- seq(from = test_size, to = nrow(data), cv_variance_folds)
+
+  train_test_folds <- lapply(split_indices, function(i) {
+    test_indices <- (i - test_size + 1):i
+    list(test = data[test_indices, ],
+         train = data[-test_indices, ])
+  })
+
+  # folds <- rsample::vfold_cv(
+  #   data,
+  #   v = cv_variance_folds,
+  #   strata = tidyselect::all_of(exposure_indicator_name)
+  # )
+  # train_test_folds <- lapply(
+  #   folds$splits,
+  #   extract_train_test
+  # )
 
   out <- lapply(train_test_folds, function(x) {
     test_indices <- x$test$rowname
