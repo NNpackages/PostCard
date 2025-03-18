@@ -68,13 +68,15 @@ oos_fitted.values_counterfactual <- function(
     extract_train_test
   )
 
+  args_glm_wo_data <- full_model.args_glm[names(full_model.args_glm) != "data"]
+
   out <- lapply(train_test_folds, function(x) {
     test_indices <- x$test$rowname
     x <- lapply(x, function(dat) dplyr::select(dat, -rowname))
-    args_glm_copy <- full_model.args_glm
-    args_glm_copy$data <- x$train
+    args_glm <- args_glm_wo_data
+    args_glm$data <- x$train
 
-    model_train <- do.call(glm, args = args_glm_copy)
+    model_train <- do.call(glm, args = args_glm)
 
     preds <- predict_counterfactual_means(
       model = model_train,
