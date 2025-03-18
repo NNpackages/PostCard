@@ -70,7 +70,10 @@ oos_fitted.values_counterfactual <- function(
 
   args_glm_wo_data <- full_model.args_glm[names(full_model.args_glm) != "data"]
 
-  out <- lapply(train_test_folds, function(x) {
+  len <- length(train_test_folds)
+  preds <- vector("list", length = len)
+  for (i in 1:len) {
+    x <- train_test_folds[[i]]
     test_indices <- x$test$rowname
     x <- lapply(x, function(dat) dplyr::select(dat, -rowname))
     args_glm <- args_glm_wo_data
@@ -78,20 +81,38 @@ oos_fitted.values_counterfactual <- function(
 
     model_train <- do.call(glm, args = args_glm)
 
-    preds <- predict_counterfactual_means(
+    preds[[i]] <- predict_counterfactual_means(
       model = model_train,
       exposure_indicator_name = exposure_indicator_name,
       newdata = x$test
     ) %>%
       dplyr::mutate(rowname = as.numeric(test_indices))
-    return(preds)
-  }) %>%
-    dplyr::bind_rows()
+  }
+  out <- dplyr::bind_rows(preds)
+
+  # out <- lapply(train_test_folds, function(x) {
+  #   test_indices <- x$test$rowname
+  #   x <- lapply(x, function(dat) dplyr::select(dat, -rowname))
+  #   args_glm <- args_glm_wo_data
+  #   args_glm$data <- x$train
+  #
+  #   model_train <- do.call(glm, args = args_glm)
+  #
+  #   preds <- predict_counterfactual_means(
+  #     model = model_train,
+  #     exposure_indicator_name = exposure_indicator_name,
+  #     newdata = x$test
+  #   ) %>%
+  #     dplyr::mutate(rowname = as.numeric(test_indices))
+  #   return(preds)
+  # }) %>%
+  #   dplyr::bind_rows()
 
   # Added the rowname before, and sorting now to "collect" the out-of-sample
   # predictions in the same order as data was originally
   out <- out %>%
-    dplyr::arrange(.data$rowname)
+    dplyr::arrange(.data$rowname) %>%
+    dplyr::select(-rowname)
 
   return(out)
 }
